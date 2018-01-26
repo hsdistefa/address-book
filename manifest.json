@@ -7,8 +7,8 @@
 
   "browser_action": {
    "default_icon": {
-   	  "24": "icons/icon24.png",
-   	  "32": "icons/icon32.png"   	  
+   	  "19": "icons/icon19.png",
+   	  "38": "icons/icon38.png"
    	},
 
    "default_popup": "popup.html"
@@ -16,7 +16,8 @@
 
   "icons": {
   	"16": "icons/icon16.png",
-  	"19": "icons/icon19.png",
+  	"24": "icons/icon24.png",
+	"32": "icons/icon32.png",  
   	"48": "icons/icon48.png",
   	"128": "icons/icon128.png"
   },
