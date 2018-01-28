@@ -1,0 +1,47 @@
+#address-table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#address-table td, #address-table th {
+    padding: 4px;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#address-table tr:nth-child(even){background-color: #f2f2f2;}
+
+#address-table tr:hover {background-color: #ddd;}
+
+#address-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
+* {
+    margin: 0;
+}
+
+h1 {
+    color: #111; font-family: 'Helvetica Neue', sans-serif; 
+    font-size: 18px; 
+    color: white;
+    font-weight: bold; 
+    letter-spacing: -1px; 
+    line-height: 1; 
+    text-align: right;
+    background: linear-gradient(#2e5785, #2cb5e8);
+    padding: 10px;
+    padding-right: 50px;
+}
+
+body {
+    margin: 0;
+    background: powderblue;
+}
