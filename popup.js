@@ -5,48 +5,57 @@ document.addEventListener('DOMContentLoaded', function() {
 		var table = document.getElementById('address-table');
 		var row;
 
+		console.log(allKeys);
 		for (var i=0; i < allKeys.length; ++i) {
-			console.log('Loaded address: ' + allKeys[i]);
-			var row = buildAddressRow(allKeys[i]);
-			table.appendChild(row);
+			var address = allKeys[i];
+			var name = items[address];
+			console.log('Loaded:\n\tname: ' + name + '\n\taddress: ' + address);
+			addAddress(name, address);
 		}
 	});
 
     // Add user input to the address book
     document.getElementById('add-address-button').onclick = function() {
-        var userInput = document.getElementById('user-input').value;
+        var inputName = document.getElementById('input-name').value;
+        var inputAddress = document.getElementById('input-address').value;
 
-        var row = buildAddressRow(userInput);
+        if (!inputAddress || !inputName) {
+        	console.log('Invalid user input');
+        	return;
+        }
 
-        // Add address row to table
-        document.getElementById('address-table').appendChild(row);
+        addAddress(inputName, inputAddress);
 
         // Save address to persistent storage
-        var addressKeyValue = {}; addressKeyValue[userInput] = "1";
+        var addressKeyValue = {}; addressKeyValue[inputAddress] = inputName;
         chrome.storage.sync.set(addressKeyValue, function() {
-        	console.log('Address saved: ' + userInput);
+        	console.log('Address saved: ' + inputAddress);
         });
     };
 
     // Add donation address to the address book
     document.getElementById('donate-button').onclick = function() {
-    	addAddress('1Hf9nMbzh17ePqpdAF6qhK3x1NcJERcV6A');
+    	addAddress('Donate Bitcoin', '1Hf9nMbzh17ePqpdAF6qhK3x1NcJERcV6A');
+    	addAddress('Donate Ethereum', '0xc8460bfb239ccd76ab862d88982f1074153285b2');
     	console.log('Thank you for your support!');
     }
 
     // Add an address to the address book
-    function addAddress(address) {
-    	var row = buildAddressRow(address);
+    function addAddress(name, address) {
+    	var row = buildAddressRow(name, address);
     	document.getElementById('address-table').appendChild(row);
     }
 
     // Build a listing for the address book
-    function buildAddressRow(address) {
+    function buildAddressRow(name, address) {
     	var row = document.createElement('tr');
 
         var col1 = document.createElement('td');
         var col2 = document.createElement('td');
         var col3 = document.createElement('td');
+        var col4 = document.createElement('td');
+
+        var nameNode = document.createTextNode(name);
 
         var addressNode = document.createTextNode(address);
 
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var removeButton = document.createElement('button');
         var removeText = document.createTextNode('x');
 
-        // ex: address | copy | x
+        // ex: name | address | copy | x
 
         copyButton.id = 'address-copy-button';
         copyButton.appendChild(copyText);
@@ -80,20 +89,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         };
 
-        col1.appendChild(addressNode);
-        col2.appendChild(copyButton);
-        col3.appendChild(removeButton);
+        col1.appendChild(nameNode);
+        col2.appendChild(addressNode);
+        col3.appendChild(copyButton);
+        col4.appendChild(removeButton);
 
         row.append(col1);
         row.append(col2);
         row.append(col3);
+        row.append(col4);
 
     	return row;
     }
 
     // Get address text from an address row
     function getAddressText(row) {
-    	return row.childNodes[0].firstChild.nodeValue;
+    	return row.childNodes[1].firstChild.nodeValue;
     }
 
     function copyTextToClipBoard(text) {
