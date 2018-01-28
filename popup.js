@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var col2 = document.createElement('td');
         var col3 = document.createElement('td');
         var col4 = document.createElement('td');
+        var col5 = document.createElement('td');
 
         var nameNode = document.createTextNode(name);
 
@@ -62,16 +63,26 @@ document.addEventListener('DOMContentLoaded', function() {
         var copyButton = document.createElement('button');
         var copyText = document.createTextNode('copy');
 
+        var qrButton = document.createElement('button');
+        var qrText = document.createTextNode('qr');
+
         var removeButton = document.createElement('button');
         var removeText = document.createTextNode('x');
 
-        // ex: name | address | copy | x
+        // ex: name | address | copy | qr | x
 
         copyButton.id = 'address-copy-button';
         copyButton.appendChild(copyText);
         // Copy the address to the clipboard
         copyButton.onclick = function() {
         	copyTextToClipBoard(address);
+        };
+
+        qrButton.id = 'address-qr-button';
+        qrButton.appendChild(qrText);
+        // Show QR code
+        qrButton.onclick = function() {
+        	showQR(address);
         };
 
         removeButton.id = 'address-remove-button';
@@ -92,12 +103,14 @@ document.addEventListener('DOMContentLoaded', function() {
         col1.appendChild(nameNode);
         col2.appendChild(addressNode);
         col3.appendChild(copyButton);
-        col4.appendChild(removeButton);
+        col4.appendChild(qrButton);
+        col5.appendChild(removeButton);
 
         row.append(col1);
         row.append(col2);
         row.append(col3);
         row.append(col4);
+        row.append(col5);
 
     	return row;
     }
@@ -105,6 +118,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get address text from an address row
     function getAddressText(row) {
     	return row.childNodes[1].firstChild.nodeValue;
+    }
+
+    function showQR(text) {
+    	var qrLink = "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode(text) + "&chs=160x160&chld=L|0"
+    	var qrLinkKV = {}; qrLinkKV["url"] = qrLink;
+    	chrome.tabs.create(qrLinkKV);
     }
 
     function copyTextToClipBoard(text) {
@@ -155,5 +174,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		  }
 
 		  document.body.removeChild(textArea);
+	}
+
+	function htmlEncode(str) {
+		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 	}
 });
