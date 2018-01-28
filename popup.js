@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
     // Add user input to the address book
-    document.getElementById('add-address').onclick = function() {
+    document.getElementById('add-address-button').onclick = function() {
         var userInput = document.getElementById('user-input').value;
 
         var row = buildAddressRow(userInput);
@@ -27,6 +27,18 @@ document.addEventListener('DOMContentLoaded', function() {
         	console.log('Address saved: ' + userInput);
         });
     };
+
+    // Add donation address to the address book
+    document.getElementById('donate-button').onclick = function() {
+    	addAddress('1Hf9nMbzh17ePqpdAF6qhK3x1NcJERcV6A');
+    	console.log('Thank you for your support!');
+    }
+
+    // Add an address to the address book
+    function addAddress(address) {
+    	var row = buildAddressRow(address);
+    	document.getElementById('address-table').appendChild(row);
+    }
 
     // Build a listing for the address book
     function buildAddressRow(address) {
