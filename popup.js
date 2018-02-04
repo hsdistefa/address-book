@@ -1,21 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-	// Populate address book with saved addresses
-	chrome.storage.sync.get(null, function(items) {
-		var allKeys = Object.keys(items);
-		var table = document.getElementById('address-table');
-		var row;
-
-		console.log(allKeys);
-		for (var i=0; i < allKeys.length; ++i) {
-			var address = allKeys[i];
-			var name = items[address];
-			console.log('Loaded:\n\tname: ' + name + '\n\taddress: ' + address);
-			addAddress(name, address);
-		}
-	});
+	// Setup UI
+	loadContainers();
+	populateAddressList();
 
     // Add user input to the address book
-    document.getElementById('add-address-button').onclick = function() {
+    document.getElementById('address-add-button').onclick = function() {
         var inputName = document.getElementById('input-name').value;
         var inputAddress = document.getElementById('input-address').value;
 
@@ -40,6 +29,33 @@ document.addEventListener('DOMContentLoaded', function() {
     	console.log('Thank you for your support!');
     }
 
+    // Load containersto UI
+    function loadContainers() {
+    	console.log('Loading images');
+    	var addButton = document.createElement('button');
+    	addButton.id = 'address-add-button';
+    	addButton.title = 'Add Address';
+    	addImageToButton(addButton, 'images/add24.png');
+
+    	document.getElementById('add-address').appendChild(addButton);
+    }
+
+    // Populate address book with saved addresses
+    function populateAddressList() {
+		chrome.storage.sync.get(null, function(items) {
+			var allKeys = Object.keys(items);
+			var table = document.getElementById('address-table');
+			var row;
+
+			for (var i=0; i < allKeys.length; ++i) {
+				var address = allKeys[i];
+				var name = items[address];
+				console.log('Loaded:\n\tname: ' + name + '\n\taddress: ' + address);
+				addAddress(name, address);
+			}
+		});
+    }
+
     // Add an address to the address book
     function addAddress(name, address) {
     	var row = buildAddressRow(name, address);
@@ -61,10 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var addressNode = document.createTextNode(address);
 
         var copyButton = document.createElement('button');
-        var copyText = document.createTextNode('copy');
 
         var qrButton = document.createElement('button');
-        var qrText = document.createTextNode('qr');
 
         var removeButton = document.createElement('button');
         var removeText = document.createTextNode('x');
@@ -72,20 +86,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // ex: name | address | copy | qr | x
 
         copyButton.id = 'address-copy-button';
-        copyButton.appendChild(copyText);
+        copyButton.title = 'Copy to Clipboard';
+        addImageToButton(copyButton, 'images/copy20.png');
         // Copy the address to the clipboard
         copyButton.onclick = function() {
         	copyTextToClipBoard(address);
         };
 
         qrButton.id = 'address-qr-button';
-        qrButton.appendChild(qrText);
+        qrButton.title = 'Show QR Code'
+        addImageToButton(qrButton, 'images/qr20.png');
         // Show QR code
         qrButton.onclick = function() {
         	showQR(address);
         };
 
         removeButton.id = 'address-remove-button';
+        removeButton.title = 'Remove';
         removeButton.appendChild(removeText);
         // Remove the row from the address book
         removeButton.onclick = function() {
@@ -178,5 +195,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	function htmlEncode(str) {
 		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+
+	function addImageToButton(button, imgPath) {
+		var img = document.createElement('img');
+		var imgURL = chrome.extension.getURL(imgPath);
+
+		img.setAttribute('src', imgURL);
+        button.appendChild(img);
 	}
 });
