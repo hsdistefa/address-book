@@ -1,43 +1,61 @@
 document.addEventListener('DOMContentLoaded', function() {
 	// Setup UI
 	loadContainers();
-	populateAddressList();
-
-    // Add user input to the address book
-    document.getElementById('address-add-button').onclick = function() {
-        var inputName = document.getElementById('input-name').value;
-        var inputAddress = document.getElementById('input-address').value;
-
-        if (!inputAddress || !inputName) {
-        	console.log('Invalid user input');
-        	return;
-        }
-
-        addAddress(inputName, inputAddress);
-
-        // Save address to persistent storage
-        var addressKeyValue = {}; addressKeyValue[inputAddress] = inputName;
-        chrome.storage.sync.set(addressKeyValue, function() {
-        	console.log('Address saved: ' + inputAddress);
-        });
-    };
-
-    // Add donation address to the address book
-    document.getElementById('donate-button').onclick = function() {
-    	addAddress('Donate Bitcoin', '1Hf9nMbzh17ePqpdAF6qhK3x1NcJERcV6A');
-    	addAddress('Donate Ethereum', '0xc8460bfb239ccd76ab862d88982f1074153285b2');
-    	console.log('Thank you for your support!');
-    }
 
     // Load containersto UI
     function loadContainers() {
-    	console.log('Loading images');
+    	// ** Header **
+    	// Add address Button
     	var addButton = document.createElement('button');
     	addButton.id = 'address-add-button';
     	addButton.title = 'Add Address';
     	addImageToButton(addButton, 'images/add24.png');
+	
+    	addButton.onclick = function() {
+    		// Add user input to the address book
+	        var inputName = document.getElementById('input-name').value;
+	        var inputAddress = document.getElementById('input-address').value;
+
+	        if (!inputAddress || !inputName) {
+	        	console.log('Invalid user input');
+	        	return;
+	        }
+
+	        addAddress(inputName, inputAddress);
+
+	        // Save address to persistent storage
+	        var addressKeyValue = {}; addressKeyValue[inputAddress] = inputName;
+	        chrome.storage.sync.set(addressKeyValue, function() {
+	        	console.log('Address saved: ' + inputAddress);
+	        });
+    	};
 
     	document.getElementById('add-address').appendChild(addButton);
+
+    	// ** Address list **
+    	populateAddressList();
+
+    	// ** Footer **
+    	var donateToggled = false;
+    	document.getElementById('donate-button').onclick = function() {
+    		// Toggles listing the donation addresses in the address book
+    		// TODO: backwards compatible const?
+    		const BTC_ADDRESS = '1Hf9nMbzh17ePqpdAF6qhK3x1NcJERcV6A';
+    		const ETH_ADDRESS = '0xc8460bfb239ccd76ab862d88982f1074153285b2';
+    		if (donateToggled) {
+    			// Untoggle donation addresses
+    			removeAddress(BTC_ADDRESS);
+    			removeAddress(ETH_ADDRESS);
+    			donateToggled = false;
+    		} else {
+    			// Add donation address to the address book
+		    	addAddress('Donate Bitcoin', BTC_ADDRESS);
+		    	addAddress('Donate Ethereum', ETH_ADDRESS);
+		    	console.log('Thank you for your support!');
+		    	donateToggled = true;
+    		}
+
+    	}
     }
 
     // Populate address book with saved addresses
@@ -60,6 +78,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function addAddress(name, address) {
     	var row = buildAddressRow(name, address);
     	document.getElementById('address-table').appendChild(row);
+    }
+
+    // Remove an address from the address book
+    function removeAddress(address) {
+    	var addressTable = document.getElementById('address-table');
+    	var rows = addressTable.childNodes;
+
+    	for (var i=2; i < rows.length; ++i) {
+    		var row = rows[i];
+    		var addressText = getAddressText(row);
+    		if (addressText === address) {
+    			row.parentNode.removeChild(row);
+    			console.log('Removed address: ' + address);
+    		}
+    	}
     }
 
     // Build a listing for the address book
@@ -137,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
     	return row.childNodes[1].firstChild.nodeValue;
     }
 
+    // Generate and show a QR code of the specified text
     function showQR(text) {
     	var qrLink = "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode(text) + "&chs=160x160&chld=L|0"
     	var qrLinkKV = {}; qrLinkKV["url"] = qrLink;
@@ -193,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		  document.body.removeChild(textArea);
 	}
 
+	// Escape html unfriendly characters
 	function htmlEncode(str) {
 		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 	}
